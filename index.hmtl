@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flavour Code Finder</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
+    h1 { margin-bottom: 20px; }
+    .input-container { display: flex; gap: 10px; margin-bottom: 20px; }
+    input {
+      width: 300px;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #555;
+      border-radius: 4px;
+      background: #1e1e1e;
+      color: #fff;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover { background: #0056b3; }
+    #result {
+      margin-top: 10px;
+      font-size: 18px;
+      min-height: 1.2em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #login-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 100px;
+    }
+    footer {
+      margin-top: 40px;
+      font-size: 12px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div id="login-container" style="display:none;">
+    <h1>Login</h1>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <p id="login-error" style="color:red; margin-top:10px;"></p>
+  </div>
+
+  <div id="app" style="display:none;">
+    <h1>Flavour Code Finder</h1>
+    <div class="input-container">
+      <input type="text" id="flavourInput" placeholder="Type a flavour, e.g. 'bluberry ic'">
+      <button onclick="findFlavour()">Lookup Code</button>
+    </div>
+    <div id="result"></div>
+    <footer>&copy; 2025 YK Web Tools</footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+  <script>
+    const flavours = [
+      "Acai","Aloe Vera","Almond","Aniseed","Apple","Apricot","Banana","Berry","Blackberry","Blackcurrant","Blood Orange","Blueberry","Blue Raspberry","Coconut","Cranberry","Cucumber","Elderflower","Grapefruit","Grape","Guava","Kiwi","Lemon","Lime","Lychee","Mango","Orange","Passionfruit","Peach","Pear","Pineapple","Plum","Pomegranate","Raspberry","Strawberry","Tropical","Watermelon",
+      "Bubblegum","Butterscotch","Cake","Candy","Caramel","Cereal","Cheesecake","Chocolate","Coffee","Cookie","Cotton Candy","Cream","Custard","Donut","Ice Cream","Honey","Vanilla",
+      "Cola","Energy Drink","Lemonade","Tea",
+      "Eucalyptus","Grape Ice","Blue Razz Ice","Pink Lemonade Ice","Tropical Storm Ice","Strawberry Kiwi Ice","Pineapple Ice","Banana Ice","Watermelon Ice","Blueberry Ice","Menthol","Mint","Peppermint","Spearmint",
+      "Tobacco","Biscuit","Cinnamon","Clove","Hazelnut","Nut","Pecan","Spice","Licorice","Nutmeg",
+      "Mr Blue","Lemon & Lime","Strawberry Raspberry Cherry","Pink Lemonade","Blueberry Sour Raspberry","Lush Ice","Kiwi Passion Fruit Guava",
+      "Dragon Fruit","Fig","Gooseberry","Jackfruit","Melon","Mulberry","Nectarine","Papaya","Red Apple","Red Berries","Rhubarb","Starfruit","Tamarind",
+      "Churro","Fudge","Jam","Jelly","Meringue","Milkshake","Muffin","Pastry","Pudding","S'mores","Syrup","Tiramisu","Toffee","Yogurt",
+      "Beer","Champagne","Cream Soda","Gin","Iced Tea","Mojito","Root Beer","Rum","Sangria","Smoothie","Sparkling Water","Vodka","Whiskey","Wine",
+      "Bay Leaf","Coriander","Ginger","Saffron","Sesame","Thyme","Turmeric"
+    ].map((name, i) => ({ name, code: `CL-${(i + 1).toString().padStart(3, '0')}` }));
+
+    const fuse = new Fuse(flavours, { keys: ["name"], threshold: 0.35, ignoreLocation: true });
+
+    function findFlavour() {
+      const q = document.getElementById("flavourInput").value.trim();
+      const r = fuse.search(q);
+      const res = document.getElementById("result");
+      res.innerHTML = '';
+
+      if (!q) {
+        res.textContent = "⏳ Please enter a flavour…";
+        return;
+      }
+
+      if (r.length) {
+        const m = r[0].item;
+        res.innerHTML = `✅ Matched: <strong>${m.name}</strong> → Code: <strong id="code">${m.code}</strong>`;
+        const copyBtn = document.createElement('button');
+        copyBtn.textContent = 'Copy Code';
+        copyBtn.onclick = () => {
+          navigator.clipboard.writeText(m.code);
+          copyBtn.textContent = 'Copied!';
+          setTimeout(() => copyBtn.textContent = 'Copy Code', 2000);
+        };
+        res.appendChild(copyBtn);
+      } else {
+        res.innerHTML = `❌ No match found. Try another flavour or check your spelling.`;
+      }
+    }
+
+    function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const error = document.getElementById("login-error");
+      if (email === "ycarocontas@gmail.com" && password === "ycaro907020") {
+        localStorage.setItem("flavour-logged-in", "true");
+        document.getElementById("login-container").style.display = "none";
+        document.getElementById("app").style.display = "block";
+      } else {
+        error.textContent = "Invalid credentials.";
+      }
+    }
+
+    // Auto-login if session exists
+    window.onload = () => {
+      if (localStorage.getItem("flavour-logged-in") === "true") {
+        document.getElementById("login-container").style.display = "none";
+        document.getElementById("app").style.display = "block";
+      } else {
+        document.getElementById("login-container").style.display = "flex";
+      }
+    }
+  </script>
+</body>
+</html>
