@@ -1,6 +1,4 @@
-Flavour Code Finder
-A lightweight web tool to quickly find and copy product flavour codes from a comprehensive list. Includes fuzzy search for typos and close matches.
+# Flavour Code Finder
+A simple web app designed to quickly find and copy flavour codes from a large, curated list. Includes smart search with typo tolerance for easy lookup.
 
-Features a simple, dark-themed login system to restrict access. All processing happens client-side — no backend required.
-
-Ideal for internal use or small teams managing diverse product flavour inventories.
+Built as a lightweight, client-side tool for managing flavour inventories efficiently. No backend or external services needed.
